@@ -19,6 +19,6 @@ export default function () {
     let body = JSON.parse(response.body);
 
     // print
-    console.log(`response body is ${body}`)
+    console.log(`response body is ${JSON.stringify(body)}`)
     console.log(`message is: ${body.Message}`); // Change to body.data.message if needed
 }
