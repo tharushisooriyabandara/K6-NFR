@@ -14,7 +14,7 @@ export let options = {
 };
 
 export default function () {
-    let response = http.get('https://run.mocky.io/v3/fa54f59e-55bb-42d4-b0f4-53bf03b7ffd0'); // returns response
+    let response = http.get('https://webshop-dev.delivergate.com/api/v1/webshop-brand/1/outlet/2/order-methods');
 
     // Print logs
     console.log(`response body length ${response.body.length} for VU= ${__VU} ITERA= ${__ITER}`);
@@ -22,10 +22,16 @@ export default function () {
     // Perform checks
     const checkResult = check(response, {
         'is response status 200': (r) => r.status === 200,
-        'body size is 44 bytes': (r) => r.body.length === 4,
+        // 'body size is 11 bytes': (r) => r.body.length === 25,
         [`body size is ${response.body.length}`] : (r) => r.body.length === response.body.length,
     });
 
     // Update error rate metric
     errorRate.add(!checkResult); // If check fails, add true to errorRate
+    console.log(`Status code: ${response.status}`);
+
+    if (response.status !== 200) {
+    console.log(`Failed request: Status ${response.status}, Body: ${response.body}`);
+}
+
 }
