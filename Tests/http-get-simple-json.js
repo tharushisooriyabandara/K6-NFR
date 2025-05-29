@@ -2,9 +2,9 @@ import http from 'k6/http';
 import { check } from 'k6';
 
 export default function () {
-    var url = 'https://run.mocky.io/v3/7c0ef53c-31e8-4c61-bf04-e8d88835570e';
+    const url = 'https://run.mocky.io/v3/7c0ef53c-31e8-4c61-bf04-e8d88835570e';
 
-    var headerParam = {
+    const headerParam = {
         headers: {
             'Content-Type': 'application/json',
         },
@@ -12,13 +12,20 @@ export default function () {
 
     const response = http.get(url, headerParam);
 
+    // Check for HTTP 200
     check(response, {
-        'is status 200': (r) => r.status === 200,
+        'Status is 200': (r) => r.status === 200,
     })
 
+    // Parse response
     let body = JSON.parse(response.body);
 
-    // print
-    console.log(`response body is ${JSON.stringify(body)}`)
-    console.log(`message is: ${body.Message}`); // Change to body.data.message if needed
+    // Log outputs
+    console.log(`Response body: ${JSON.stringify(body)}`);
+    console.log(`Message: ${body.Message}`); // Update key if different
+
+    // Check for expected message
+    check(response, {
+        'Is message success: ': (r) => JSON.parse(r.body).Message === "Data fetched successfully",
+    })
 }
