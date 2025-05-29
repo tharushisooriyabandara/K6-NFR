@@ -27,5 +27,5 @@ export default function () {
     // Check for expected message
     check(response, {
         'Is message success: ': (r) => JSON.parse(r.body).Message === "Data fetched successfully",
-    })
+    });
 }
