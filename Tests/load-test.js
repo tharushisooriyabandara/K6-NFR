@@ -17,7 +17,7 @@ export let options = {
 };
 
 export default function () {
-  let response = http.get('https://run.mocky.io/v3/f04c0fd5-0cba-4a64-949c-13490552fc32');
+  let response = http.get('https://webshop-dev.delivergate.com/api/v1/webshop-brand/1/outlet/2/order-methods');
   myTrend.add(res.timings.duration);
   sleep(1);
 }
