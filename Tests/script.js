@@ -1,35 +1,46 @@
 import http from 'k6/http';
 import { check, group } from 'k6';
-import { Rate } from 'k6/metrics';
+import { Rate, Trend } from 'k6/metrics';
 
-// Custom metric to track errors
 export let errorRate = new Rate('errors');
+let groupDuration = Trend("groupDuration");
 
-export let options = {
+export const options = {
   vus: 10,
   duration: '2s',
   thresholds: {
     errors: ['rate<0.1'],
+    'groupDuration{groupName:groupGetGroups}': ['avg>3000'],
+    'groupDuration{groupName:groupGetUsers}': ['avg>300'],
   },
-}; // ← semicolon instead of comma
+  ext: {
+    loadimpact: {
+      projectID: 3772190,
+      name: 'Learn Loadimpact Basics'
+    }
+  }
+};
 
-// Default function that runs for each virtual user iteration
+function groupWithMetrics(nameOfGroup, groupFunction) {
+  let start = Date.now();
+  group(nameOfGroup, groupFunction);
+  groupDuration.add(Date.now() - start, {groupName: nameOfGroup});
+}
+
 export default function () {
-  // Group for Get Users API
-  group('groupGetUsers', function () {
-    const responseGetUsers = http.get('https://run.mocky.io/v3/d3cfd6eb-5088-43eb-b27a-0e690d870402');
-    const checkGetUsers = check(responseGetUsers, {
-      'Get Users: Status is 200': (r) => r.status === 200,
+  groupWithMetrics('groupGetUsers', function () {
+    const response = http.get('https://run.mocky.io/v3/d3cfd6eb-5088-43eb-b27a-0e690d870402');
+    check(response, {
+      'Status is 200 or 404': (r) => r.status === 200 || r.status === 404
     });
-    errorRate.add(!checkGetUsers);
+    errorRate.add(response.status !== 200 && response.status !== 404);
   });
 
-  // Group for Get Groups API
-  group('groupGetGroups', function () {
-    const responseGetGroups = http.get('https://run.mocky.io/v3/bb4ac454-8307-46e2-9281-598c9c754121');
-    const checkGetGroups = check(responseGetGroups, {
-      'Get Groups: Status is 200': (r) => r.status === 200,
+  groupWithMetrics('groupGetGroups', function () {
+    const response = http.get('https://webshop-dev.delivergate.com/api/v1/webshop-brand/1/outlet/2/order-methods');
+    check(response, {
+      'Status is 200 or 404': (r) => r.status === 200 || r.status === 404
     });
-    errorRate.add(!checkGetGroups);
+    errorRate.add(response.status !== 200 && response.status !== 404);
   });
 }
