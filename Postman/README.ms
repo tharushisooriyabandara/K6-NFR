@@ -13,7 +13,7 @@
 // install postman to k6 converter
 
     Developer acively using Postman
-    You can directly take Postman collection and env variables fom dev team
+    You can directly take Postman collection and env variables fom devlopment team
     Use converter to autogenerate k6 Scripts
     Fix K6 scripts to satisfy your requirements
 
@@ -28,6 +28,58 @@
 
 4 - now you can see script.js file & 3rd party postman to k6 libraries(libs) are automatically generated
 
-5 - 
+----------------------------
 
+# setup project to test
 
+1 - install moodlewindowsinstaller: https://onedrive.live.com/?id=E000686C73D4D1FF%2115900&resid=E000686C73D4D1FF%2115900&e=QTg1Bo&migratedtospo=true&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvcyFBdl9SMUhOc2FBRGdfQndxeXFsQVB3RVBYQm5kP2U9UVRnMUJv&cid=e000686c73d4d1ff&v=validatepermission
+
+2 - click 'start moodle' > run as admininstrator
+
+3 - open terminal > press 1
+
+4 - then you can see the moodle is started successfully
+
+5 - go to credentials file inside the moodlewindowsinstaller folder
+
+6 - copy the URL: http://127.0.0.1:83/my/ & paste it in the browser
+
+note: you can see like this message: Fatal error: $CFG->dataroot is not configured properly, directory does not exist or is not accessible! Exiting.
+
+so lets fix it first
+
+----------------------------
+
+1 - go to moodlewindowsinstaller -> server -> moodle -> configure
+
+2 - copy the path directory
+
+3 - open the notepad with configure file
+
+4 - you can see the dataroot like below
+        $CFG->dataroot  = 'D:\\Personal\\SetUp\\MoodleWindowsInstaller-latest\\server\\moodledata';
+
+5 - we have to change the directory like below & SAVE
+        $CFG->dataroot  = 'C:\\Users\\soori\\Downloads\\MoodleWindowsInstaller-latest\\MoodleWindowsInstaller-latest\\server\\moodledata';
+
+6 - restart the moodle again 
+
+7 - navigate to here again - http://127.0.0.1:83/my/
+
+8 - login with admin credentials
+        username: admin
+        PW: Admin123!@#
+
+----------------------------
+
+now you are in the interface
+
+1 - go admininstrator -> courses -> add a new course
+
+2 - open devloper tool & inspect
+
+----------------------------
+
+lets execute the postman to k6 generated k6 scripts
+
+1 - open terminal -> k6 run postman/script.js
