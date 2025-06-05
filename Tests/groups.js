@@ -31,7 +31,7 @@ export default function () {
   groupWithMetrics('groupGetUsers', function () {
     const response = http.get('https://run.mocky.io/v3/d3cfd6eb-5088-43eb-b27a-0e690d870402');
     check(response, {
-      'Status is 200 or 404': (r) => r.status === 200 || r.status === 404
+      'Status is 200 or 404': (r) => r.status === 200
     });
     errorRate.add(response.status !== 200 && response.status !== 404);
   });
@@ -39,7 +39,7 @@ export default function () {
   groupWithMetrics('groupGetGroups', function () {
     const response = http.get('https://webshop-dev.delivergate.com/api/v1/webshop-brand/1/outlet/2/order-methods');
     check(response, {
-      'Status is 200 or 404': (r) => r.status === 200 || r.status === 404
+      'Status is 200 or 404': (r) => r.status === 200
     });
     errorRate.add(response.status !== 200 && response.status !== 404);
   });
