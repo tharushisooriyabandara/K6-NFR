@@ -6,16 +6,18 @@ export let options = { maxRedirects: 4 };
 const Request = Symbol.for("request");
 const courseURL = "http://127.0.0.1:83/webservice/rest/server.php";
 const token = "585a5e34abe199537fec2640b8252ef7";
+
+// ✅ Use timestamp to make shortname unique on each run
 const uniqueShortname = "mycourses" + Date.now();
 let createdCourseId = "";
 
 export default function () {
-  // CREATE COURSE
+  // ✅ CREATE COURSE
   postman[Request]({
     name: "CREATE COURSE",
     id: "create-course",
     method: "POST",
-    address: `${courseURL}?wstoken=${token}&moodlewsrestformat=json&wsfunction=core_course_create_courses&courses[0][fullname]=mycourses&courses[0][shortname]=${uniqueShortname}&courses[0][categoryid]=1&courses[0][visible]=1&courses[0][summary]=text&courses[0][enablecompletion]=0&courses[0][summaryformat]=1&courses[0][format]=topics&courses[0][numsections]=0`,
+    address: `${courseURL}?wstoken=${token}&moodlewsrestformat=json&wsfunction=core_course_create_courses&courses[0][fullname]=MyTestCourse&courses[0][shortname]=${uniqueShortname}&courses[0][categoryid]=1`,
     data: {},
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     post(response) {
@@ -24,15 +26,15 @@ export default function () {
         const res = JSON.parse(responseBody);
         if (res && res[0] && res[0].id) {
           createdCourseId = res[0].id;
-          console.log("Created course ID:", createdCourseId);
+          console.log("✅ Created course ID:", createdCourseId);
         } else {
-          console.error("Create failed: No course ID found", responseBody);
+          console.error("❌ Create failed: No course ID found", responseBody);
         }
       });
     }
   });
 
-  // GET COURSE
+  // ✅ GET COURSE
   postman[Request]({
     name: "GET COURSE",
     id: "get-course",
@@ -43,15 +45,15 @@ export default function () {
         pm.response.to.have.status(200);
         const data = JSON.parse(responseBody);
         if (data && data.length > 0) {
-          console.log("Fetched course ID:", data[0].id);
+          console.log("✅ Fetched course ID:", data[0].id);
         } else {
-          console.error("Get failed: No course data found", responseBody);
+          console.error("❌ Get failed: No course data found", responseBody);
         }
       });
     }
   });
 
-  // DELETE COURSE
+  // ✅ DELETE COURSE
   postman[Request]({
     name: "DELETE COURSE",
     id: "delete-course",
@@ -60,7 +62,7 @@ export default function () {
     post(response) {
       pm.test("Delete course - Status code is 200", function () {
         pm.response.to.have.status(200);
-        console.log("Deleted course ID:", createdCourseId);
+        console.log("✅ Deleted course ID:", createdCourseId);
       });
     }
   });
