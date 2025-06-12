@@ -1,16 +1,33 @@
 /*
+  Declare environment variables for different environments: INT (Integration), DEV (Development), and PROD (Production)
 
-env.js – Centralized Environment Config
-
-This file defines environment-specific URLs and settings.
-
-Example for testing google.com:
-
-dev: http://www.google-dev.com – used by developers for continuous deployment
-
-int: http://www.google-int.com – used by testers for integration and regression testing
-
-prod: http://www.google.com – live production environment
-
+  Moodle is hosted locally:
+  - INT:  http://127.0.0.1:83
+  - DEV:  http://127.0.0.1:84
+  - PROD: http://www.moodle.com
 */
 
+var SERVER_INT_URL  = "http://127.0.0.1:83/webservice/rest/server.php";
+var SERVER_DEV_URL  = "http://127.0.0.1:84/webservice/rest/server.php";
+var SERVER_PROD_URL = "http://www.moodle.com/webservice/rest/server.php";
+
+// Export environment objects
+export let intEnvironment = {
+  SERVER_ENDPOINT: SERVER_INT_URL,
+};
+
+export let devEnvironment = {
+  SERVER_ENDPOINT: SERVER_DEV_URL,
+};
+
+export let prodEnvironment = {
+  SERVER_ENDPOINT: SERVER_PROD_URL,
+};
+
+// Example token (can move to shell script if dynamic)
+export let token = "585a5e34abe199537fec2640b8252ef7";
+
+// Optional environment labels
+export let int = "int";
+export let dev = "dev";
+export let prod = "prod";
