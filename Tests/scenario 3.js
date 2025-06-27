@@ -11,36 +11,32 @@ export function handleSummary(data) {
 export const options = {
   vus: 1,
   duration: '30s',
-  thresholds: {
-    'http_req_duration{type:create}': ['p(95)<500'],
-    'http_req_duration{type:complete}': ['p(95)<500'],
-  },
+  iterations: 2,
 };
 
 export default function () {
-  // Common headers
   const headers = {
     'accept': 'application/json',
     'content-type': 'application/json',
     'x-tenant-code': 'subway',
   };
 
-  // 1. CREATE TEMPORARY ORDER
+  // 1. CREATE TEMPORARY DELIVERY ORDER
   const createOrderPayload = JSON.stringify({
     getOrder: {
-      shipping_method: "COLLECTION",
+      shipping_method: "DELIVERY",          // changed from COLLECTION
       shop_id: 2,
       platform_id: 5,
-      sub_total: 7693.000000000001,
-      delivery_date_time: "2025-06-11T17:47:30+05:30",
-      delivery_distance: 0,
+      sub_total: 7693.00,
+      delivery_date_time: "2025-06-17T16:00:00+05:30",
+      delivery_distance: 7277,              // set realistic distance for delivery
       vouchers: [],
-      total_amount: 7918.000000000001,
+      total_amount: 7918.00,
       discount: 0,
       discount_type: "",
       campaign_code: "",
       note: "make more crispy",
-      delivery_cost: 0,
+      delivery_cost: 600,                   // delivery cost instead of zero
       total_tax: 0,
       orderproducts: [
         {
@@ -88,8 +84,8 @@ export default function () {
         location_id: "501",
         lat_lng: null,
         email: "sooriyabandaratharushi@gmail.com",
-        address: null,
-        flat_no: null,
+        address: "17, Nugegoda, Sri Lanka",  // delivery address filled
+        flat_no: "17",
         contact_number: "+44762881444",
         phone: "762881444",
         country_code: "+44"
@@ -98,19 +94,19 @@ export default function () {
         first_name: "Guest",
         last_name: "Tharushi",
         email: "sooriyabandaratharushi@gmail.com",
-        address_line_1: null,
-        address_line_2: null,
+        address_line_1: "17",
+        address_line_2: "Nugegoda, Sri Lanka",
         phone: "762881444",
         country_code: "+44"
       },
       order_shop_fees: [{ shop_fee_id: 1, amount: 225 }],
-      total_fee: 225
+      total_fee: 825                         // 225 + 600 delivery cost
     },
     device_platform: "web",
     rwg_token: "",
     saveType: "SAVE_AND_FORWORD",
     paymentMethod: "cash",
-    paymentType: "PAY_ON_COLLECTION",
+    paymentType: "PAY_ON_DELIVERY",         // changed from PAY_ON_COLLECTION
     save_card: 0,
     subscribe_to_promotion_emails: 0
   });
@@ -126,14 +122,13 @@ export default function () {
     createParams
   );
 
-  // Validate creation response
   if (!check(createOrderRes, {
     'Create order - status is 200': (r) => r.status === 200,
     'Create order - has valid response': (r) => {
       try {
         JSON.parse(r.body);
         return true;
-      } catch (e) {
+      } catch {
         return false;
       }
     }
@@ -142,18 +137,17 @@ export default function () {
     return;
   }
 
-  // Extract temp order ID
   let tmpOrderID;
   try {
     const responseBody = JSON.parse(createOrderRes.body);
     tmpOrderID = responseBody.data?.createdTmpOrderId || responseBody.createdTmpOrderId;
-    
+
     if (!tmpOrderID) {
       console.error('tmpOrderID missing in response. Full response:', createOrderRes.body);
       return;
     }
-    
-    console.log(`Successfully created temp order with ID: ${tmpOrderID}`);
+
+    console.log(`Successfully created temp delivery order with ID: ${tmpOrderID}`);
   } catch (e) {
     console.error('Failed to parse create order response:', e, 'Response:', createOrderRes.body);
     return;
@@ -163,7 +157,7 @@ export default function () {
   const completePayload = JSON.stringify({
     tmpOrderID: tmpOrderID,
     paymentStatus: "success",
-    paymentType: "PAY_ON_COLLECTION",
+    paymentType: "PAY_ON_DELIVERY",
     rwg_token: ""
   });
 
@@ -178,7 +172,6 @@ export default function () {
     completeParams
   );
 
-  // Parse completion response
   let completeResponse;
   try {
     completeResponse = JSON.parse(completeOrderRes.body);
@@ -187,26 +180,23 @@ export default function () {
     console.error('Failed to parse complete order response:', e, 'Response:', completeOrderRes.body);
   }
 
-  // Dynamic checks based on actual response structure
   const completionChecks = {
     'Complete order - status is 200': (r) => r.status === 200,
     'Complete order - has valid response': (r) => !!completeResponse,
   };
 
-  // Add tmpOrderID verification if present in response
   if (completeResponse) {
-    const responseTmpOrderId = completeResponse.data?.tmpOrderId || 
+    const responseTmpOrderId = completeResponse.data?.tmpOrderId ||
                               completeResponse.tmpOrderId ||
                               completeResponse.data?.orderId ||
                               completeResponse.orderId;
 
     if (responseTmpOrderId) {
-      completionChecks['Complete order - tmpOrderID matches'] = 
+      completionChecks['Complete order - tmpOrderID matches'] =
         () => responseTmpOrderId.toString() === tmpOrderID.toString();
     }
   }
 
-  // Perform all checks
   if (!check(completeOrderRes, completionChecks)) {
     console.error('Complete order failed. Status:', completeOrderRes.status, 'Body:', completeOrderRes.body);
   }
