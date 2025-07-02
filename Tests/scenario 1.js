@@ -9,9 +9,8 @@ export function handleSummary(data) {
 }
 
 export const options = {
-  vus: 1,                      // 2 virtual users
-  duration: '30s',              // 2 minute duration
-  iterations: 2,               // 2 iterations per VU
+  vus: 5,                      // 2 virtual users
+  duration: '30s',            // 2 minute duratio              // 2 iterations per VU
   thresholds: {
     // 'http_req_duration{type:create}': ['p(95)<500'],
     // 'http_req_duration{type:complete}': ['p(95)<500'],
